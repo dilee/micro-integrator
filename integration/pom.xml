@@ -732,9 +732,9 @@
                 <version>${synapse.version}</version>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-model</artifactId>
+                <version>${maven.model.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -783,7 +783,7 @@
         <mysql-connector-java.version>5.1.6</mysql-connector-java.version>
         <opensaml.version>2.2.3</opensaml.version>
         <org.wso2.json.version>3.0.0.wso2v1</org.wso2.json.version>
-        <junit.version>4.12</junit.version>
+        <maven.model.version>3.3.9</maven.model.version>
         <testng.suiteXml.location>src/test/resources/testng.xml</testng.suiteXml.location>
 
         <!-- TODO Remove after fixing the test cases, kept for compilation purposes.-->

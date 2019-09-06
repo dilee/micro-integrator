@@ -1,38 +1,79 @@
+# Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#
+# WSO2 Inc. licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations
+# under the License.
 
 #!/bin/bash
 
-# Copyright (c) 2019, WSO2 Inc. (http://www.wso2.com). All Rights Reserved.
-#
-# This software is the property of WSO2 Inc. and its suppliers, if any.
-# Dissemination of any information or reproduction of any material contained
-# herein is strictly forbidden, unless permitted by WSO2 in accordance with
-# the WSO2 Commercial License available at http://wso2.com/licenses.
-# For specific language governing the permissions and limitations under this
-# license, please see the license as well as any agreement you’ve entered into
-# with WSO2 governing the purchase of this software and any associated services.
-
 set -o xtrace
 
-#Setting up the development environment
-cd ../../cmd
+#Extract the compressed archive based on the platform and the bitype
+function extractCompressArchive() {
+    platform=$(uname -s)
+    bitType=$(arch)
 
-#download all the dependencies
-go mod vendor
+    if [[ "${platform}" == "Linux" && "${bitType}" == "i586" ]]; then
+        tar -zxvf wso2mi-cli-$VERSION-linux-i586.tar.gz
 
-#build Micro Integrator CLI
-cd ../
-make install
+    elif [[ "${platform}" == "Linux" && "${bitType}" == "x64" ]]; then
+        tar -zxvf wso2mi-cli-$VERSION-linux-x64.tar.gz
 
-#Extract the compressed archive generated
-cd ../../cmd/build
+    elif [[ "${platform}" == "Darwin" && "${bitType}" == "x64"  ]]; then
+        tar -zxvf wso2mi-cli-$VERSION-macosx-x64.tar.gz
 
-#for f in *.tar.gz
-#do
-#  tar zxvf ../../cmd/build
-#done
+    elif [[ "${platform}" == "windows" && "${bitType}" == "i586" ]]; then
+        tar -zxvf wso2mi-cli-$VERSION-windows-i586.tar.gz
 
-tar zxvf ../../cmd/build
+    elif [[ "${platform}" == "windows" && "${bitType}" == "x64" ]]; then
+        tar -zxvf wso2mi-cli-$VERSION-windows-x64.tar.gz
+    fi
+}
+#get the product version from the pom file
+function getPomVersion(){
+    VERSION=$(cat pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}');
+    echo $VERSION
+}
 
-#start the application
-cd ../../cmd/build/wso2mi-cli--f/bin
-./mi
+#Setting up the CLI environment
+
+#Check if the cli build is available in the location
+DIR="../../../../../cmd/build"
+if [ -d "$DIR" ]; then
+    echo "CLI build exists. Hence skipping the environment setup phase"
+else
+    echo "CLI build does not exists. Setting up the environment..."
+    #download all the dependencies
+    cd ../../cmd
+    go mod vendor
+    sleep 10
+
+    #build Micro Integrator CLI
+    echo "Build Micro Integrator CLI"
+    cd ../
+
+    #get the version from the pom
+    getPomVersion
+    cd cmd
+    ./build.sh -t mi.go -v ${VERSION} -f
+
+    #Extract the compressed archive generated
+    cd ../cmd/build
+    extractCompressArchive
+
+    #start the application
+    cd wso2mi-cli-$VERSION/bin
+    mi
+
+    echo "ClI setup Complete"
+fi
