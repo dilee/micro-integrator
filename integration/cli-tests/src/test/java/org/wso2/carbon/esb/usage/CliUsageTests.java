@@ -51,6 +51,11 @@ public class CliUsageTests {
         TestUtils testUtils = new TestUtils();
         pomVersion = testUtils.getPomVerion();
 
+        System.out.println("Working Directory = " +
+                System.getProperty("user.dir"));
+
+        Process process1 = new ProcessBuilder("pwd").start();
+
         Process process = new ProcessBuilder("../src/test/java/EnvSetup.sh").start();
 
         try (BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -66,6 +71,8 @@ public class CliUsageTests {
     @Test
     public void miShowAllApiTest() throws IOException {
         try {
+            System.out.println("Working Directory = " +
+                    System.getProperty("user.dir"));
 
             ProcessBuilder builder = new ProcessBuilder("../../../cmd/build/wso2mi-cli-"+pomVersion+"/bin/mi", "api", "show");
             Process process = builder.start();
@@ -82,7 +89,7 @@ public class CliUsageTests {
 
         } catch (IOException e) {
             System.out.println("Exception = " + e.getMessage());
-        }finally {
+        } finally {
             reader.close();
         }
     }
@@ -188,7 +195,7 @@ public class CliUsageTests {
 
         } catch (IOException e) {
             log.info("Exception = " + e.getMessage());
-        }finally {
+        } finally {
             reader.close();
         }
     }
@@ -214,7 +221,7 @@ public class CliUsageTests {
 
         } catch (IOException e) {
             log.info("Exception = " + e.getMessage());
-        }finally {
+        } finally {
             reader.close();
         }
     }
@@ -242,7 +249,7 @@ public class CliUsageTests {
 
         } catch (IOException e) {
             log.info("Exception = " + e.getMessage());
-        }finally {
+        } finally {
             reader.close();
         }
     }
