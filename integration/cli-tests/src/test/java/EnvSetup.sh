@@ -19,16 +19,21 @@
 set -o xtrace
 
 echo "Executing env script"
+platform=$(uname -s)
+bitType=$(arch)
+
+echo "Platform : $platform"
+echo "Bittype : $bitType"
 
 #Extract the compressed archive based on the platform and the bitype
-function extractCompressArchive() {
+extractCompressArchive() {
     platform=$(uname -s)
     bitType=$(arch)
 
     if [[ "${platform}" == "Linux" && "${bitType}" == "i586" ]]; then
         tar -zxvf wso2mi-cli-$VERSION-linux-i586.tar.gz
 
-    elif [[ "${platform}" == "Linux" && "${bitType}" == "x64" ]]; then
+    elif [[ "${platform}" == "Linux" && "${bitType}" == "x86_64" ]]; then
         tar -zxvf wso2mi-cli-$VERSION-linux-x64.tar.gz
 
     elif [[ "${platform}" == "Darwin" && "${bitType}" == "x64"  ]]; then
@@ -42,21 +47,25 @@ function extractCompressArchive() {
     fi
 }
 #get the product version from the pom file
-function getPomVersion(){
+getPomVersion(){
     VERSION=$(cat pom.xml | grep "^    <version>.*</version>$" | awk -F'[><]' '{print $3}');
-    echo $VERSION
+    echo "Version : $VERSION"
 }
 
+setup(){
 #Setting up the CLI environment
-
+echo "Working Directory "
+echo pwd
 #Check if the cli build is available in the location
 DIR="../../../cmd/build"
+pwd
+
 if [ -d "$DIR" ]; then
     echo "CLI build exists. Hence skipping the environment setup phase"
 else
     echo "CLI build does not exists. Setting up the environment..."
     #download all the dependencies
-    cd ../../cmd
+    cd ../../../cmd
     go mod vendor
     sleep 10
 
@@ -76,6 +85,8 @@ else
     #start the application
     cd wso2mi-cli-$VERSION/bin
     mi
-
     echo "ClI setup Complete"
 fi
+}
+
+setup
